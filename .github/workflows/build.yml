@@ -7,7 +7,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Force Python 3.11 (Stability for KivyMD 1.2.0)
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -16,12 +15,27 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+          # FIX: Remove conflicting libunwind to solve the broken package error
+          sudo apt-get remove -y libunwind-14-dev libunwind-dev || true
+          
+          # Now install everything normally
+          sudo apt-get install -y python3-pip build-essential git python3-dev ffmpeg \
+            libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
+            libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev \
+            libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+            libunwind-dev
+          
           pip install --user --upgrade buildozer cython==0.29.33 virtualenv
 
       - name: Build with Buildozer
         run: |
-          # We use the direct command here to ensure 3.11 is used
           yes | sdkmanager --licenses || true
-          buildozer android debug
+          # We run buildozer directly to ensure it uses the local environment
+          ~/.local/bin/buildozer android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AuraWay-TTS
+          path: bin/*.apk
           
