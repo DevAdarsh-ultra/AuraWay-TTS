@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build AuraWay APK
 on: [push]
 
 jobs:
@@ -7,9 +7,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get Date
-        id: get-date
-        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Buildozer Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev
+          pip install --user --upgrade buildozer cython virtualenv
+
+      - name: Accept Android Licenses
+        run: |
+          yes | sdkmanager --licenses || true
 
       - name: Build with Buildozer
         uses: digreatbrian/buildozer-action@v2
@@ -20,6 +31,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AuraWay-TTS-${{ steps.get-date.outputs.date }}
+          name: AuraWay-TTS-Debug
           path: bin/*.apk
           
