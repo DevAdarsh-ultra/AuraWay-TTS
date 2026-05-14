@@ -7,30 +7,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      # Force Python 3.11 (Stability for KivyMD 1.2.0)
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Buildozer Dependencies
+      - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev
-          pip install --user --upgrade buildozer cython virtualenv
-
-      - name: Accept Android Licenses
-        run: |
-          yes | sdkmanager --licenses || true
+          sudo apt-get install -y python3-pip build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+          pip install --user --upgrade buildozer cython==0.29.33 virtualenv
 
       - name: Build with Buildozer
-        uses: digreatbrian/buildozer-action@v2
-        with:
-          buildozer-cmd: buildozer android debug
-          python-version: 3.11
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: AuraWay-TTS-Debug
-          path: bin/*.apk
+        run: |
+          # We use the direct command here to ensure 3.11 is used
+          yes | sdkmanager --licenses || true
+          buildozer android debug
           
