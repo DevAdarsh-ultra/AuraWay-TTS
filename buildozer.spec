@@ -6,13 +6,13 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 0.1
 
-# Keep requirements simple
-requirements = python3==3.11.0, kivy==2.3.0, kivymd==1.2.0, plyer
+# Keep it simple: let the action handle the specific sub-versions
+requirements = python3, kivy, kivymd==1.2.0, plyer
 
 orientation = portrait
 fullscreen = 0
 
-# CHANGE THIS LINE: Only one architecture to save memory/time
+# TARGET ONLY ONE ARCHITECTURE (This is the secret fix for memory errors!)
 android.archs = arm64-v8a
 
 android.api = 34
