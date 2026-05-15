@@ -7,16 +7,39 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build with Buildozer
-        # This is the official community-maintained action
-        uses: ArtemSBulgakov/buildozer-action@v1
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
-          buildozer_version: master
-          python_version: 3.11
+          python-version: '3.11'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential git ffmpeg libsdl2-dev libsdl2-image-dev \
+            libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev \
+            libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev \
+            libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+            openjdk-17-jdk-headless autoconf automake libtool pkg-config \
+            libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          
+          pip install --upgrade pip
+          pip install buildozer cython==0.29.33 virtualenv
+
+      - name: Build with Buildozer
+        run: |
+          # Manually accept Android licenses
+          yes | sdkmanager --licenses || true
+          
+          # Run build directly
+          buildozer android debug
+        env:
+          # This helps Buildozer find the Java installation
+          JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AuraWay-TTS
+          name: AuraWay-TTS-Package
           path: bin/*.apk
           
