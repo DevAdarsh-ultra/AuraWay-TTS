@@ -6,13 +6,13 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 0.1
 
-# Keep it simple: let the action handle the specific sub-versions
-requirements = python3, kivy, kivymd==1.2.0, plyer
+# LOCKED TO YOUR VERSION
+requirements = python3, kivy==2.3.0, kivymd==1.2.0, plyer, sdl2_ttf==2.0.15
 
 orientation = portrait
 fullscreen = 0
 
-# TARGET ONLY ONE ARCHITECTURE (This is the secret fix for memory errors!)
+# Still keeping one architecture for stability
 android.archs = arm64-v8a
 
 android.api = 34
